@@ -26,7 +26,7 @@ module.exports = {
 			}
 		]
 	},
-	
+
 	// enable Source Maps
 	devtool: 'source-map',
 
@@ -38,6 +38,9 @@ module.exports = {
 		compress: true,
 
 		// enable pushState() routing, as used by preact-router et al:
-		historyApiFallback: true
+		historyApiFallback: true,
+
+		// reload browser
+		inline: true
 	}
 };
