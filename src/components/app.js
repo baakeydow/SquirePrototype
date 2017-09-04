@@ -21,11 +21,11 @@ export default class App extends Component {
 		if (!this.state.selected) {
 			return;
 		} else if (isBold) {
-			this.state.editor.bold(this.state.selected);
-			this.state.bold = true;
+			this._editor.bold(this.state.selected);
+			this.setState({bold: true});
 		} else {
-			this.state.editor.removeBold(this.state.selected);
-			this.state.bold = false;
+			this._editor.removeBold(this.state.selected);
+			this.setState({bold: false});
 		}
 	}
 
@@ -34,11 +34,11 @@ export default class App extends Component {
 		if (!this.state.selected) {
 			return;
 		} else if (isIt) {
-			this.state.editor.italic(this.state.selected);
-			this.state.it = true;
+			this._editor.italic(this.state.selected);
+			this.setState({it: true});
 		} else {
-			this.state.editor.removeItalic(this.state.selected);
-			this.state.it = false;
+			this._editor.removeItalic(this.state.selected);
+			this.setState({it: false});
 		}
 	}
 
@@ -47,91 +47,103 @@ export default class App extends Component {
 		if (!this.state.selected) {
 			return;
 		} else if (isUnderline) {
-			this.state.editor.underline(this.state.selected);
-			this.state.underline = true;
+			this._editor.underline(this.state.selected);
+			this.setState({underline: true});
 		} else {
-			this.state.editor.removeUnderline(this.state.selected);
-			this.state.underline = false;
+			this._editor.removeUnderline(this.state.selected);
+			this.setState({underline: false});
 		}
 	}
 
 	removeAllFormatting() {
 		if (!this.state.selected) {
 			return;
-		} else if (this.state.editor.hasFormat(this.state.selected)) {
-			this.state.editor.removeAllFormatting(this.state.selected);
-			this.state.bold = false;
-			this.state.it = false;
-			this.state.underline = false;
+		} else if (this._editor.hasFormat(this.state.selected)) {
+			this._editor.removeAllFormatting(this.state.selected);
+			this.setState({
+				bold: false,
+				it: false,
+				underline: false
+			});
 		} else {
 			console.log('not formated yet');
 		}
 	}
 
 	undo() {
-		this.state.editor.undo();
+		this._editor.undo();
 	}
+
 	redo() {
-		this.state.editor.redo();
+		this._editor.redo();
 	}
+
 	alignLeft() {
-		this.state.editor.setTextAlignment('left');
+		this._editor.setTextAlignment('left');
 	}
+
 	alignCenter() {
-		this.state.editor.setTextAlignment('center');
+		this._editor.setTextAlignment('center');
 	}
+
 	alignRight() {
-		this.state.editor.setTextAlignment('right');
+		this._editor.setTextAlignment('right');
 	}
+
 	alignJustify() {
-		this.state.editor.setTextAlignment('justify');
+		this._editor.setTextAlignment('justify');
 	}
+
 	makeUList() {
 		if (!this.state.selected) {
 			return;
 		}
-		this.state.editor.makeUnorderedList(this.state.selected);
+		this._editor.makeUnorderedList(this.state.selected);
 	}
+
 	makeOList() {
 		if (!this.state.selected) {
 			return;
 		}
-		this.state.editor.makeOrderedList(this.state.selected);
+		this._editor.makeOrderedList(this.state.selected);
 	}
+
 	rmList() {
 		if (!this.state.selected) {
 			return;
 		}
-		this.state.editor.removeList(this.state.selected);
+		this._editor.removeList(this.state.selected);
 	}
+
 	printHtml() {
-		if (this.state.editor) {
-			const nodes = this.state.editor.getDocument().getElementsByClassName('clientView')[0].childNodes;
+		if (this._editor) {
+			const nodes = this._editor.getDocument().getElementsByClassName('clientView')[0].childNodes;
 			nodes.forEach((node) => {
 				document.getElementById('render').innerText += node.outerHTML;
 			});
 		}
 	}
+
 	clearHtml() {
 		document.getElementById('render').innerText = '';
 	}
+
 	setTextColour() {
 		if (this.state.selected) {
-			console.log('====================>',this.state.textColor);
-			this.state.editor.setTextColour(this.state.textColor);
+			this._editor.setTextColour(this.state.textColor);
 		}
 	}
+
 	setFontSize() {
 		if (this.state.selected) {
-			console.log('====================>',this.state.textSize);
-			this.state.editor.setFontSize(this.state.textSize);
+			this._editor.setFontSize(this.state.textSize);
 		}
 	}
 
 	componentDidMount() {
 		var node = document.getElementById('textEditor');
+		this._editor = new Squire(node);
 		this.setState({
-			editor: new Squire(node),
 			bold: false,
 			it: false,
 			underline: false,
@@ -140,37 +152,40 @@ export default class App extends Component {
 			selected: null
 		})
 		// config
-		this.state.editor.setConfig({
+		this._editor.setConfig({
 			blockTag: 'P', // making a new <p> on enter key
 			blockAttributes: { style: 'font-size: 16px;'}
 		});
 		// init
-		this.state.editor.setHTML("<textarea>");
+		this._editor.setHTML("<textarea>");
 		// events
-		this.state.editor.addEventListener("input", function(event) {
+		this._editor.addEventListener("input", function(event) {
 			this.clearHtml();
 		}.bind(this));
-		this.state.editor.addEventListener("select", function(event) {
-			this.state.selected = this.state.editor.getSelectedText();
+		this._editor.addEventListener("select", function(event) {
+			var selected = this._editor.getSelectedText()
+			this.setState({selected: selected});
 			console.log(this.state.selected);
 		}.bind(this));
-		this.state.editor.addEventListener("blur", function(event) {
+		this._editor.addEventListener("blur", function(event) {
 			if (this.state.selected) {
-				console.log(this.state.editor.getFontInfo());
+				console.log(this._editor.getFontInfo());
 			}
 		}.bind(this));
-		this.state.editor.addEventListener("pathChange", function(event) {
+		this._editor.addEventListener("pathChange", function(event) {
 			console.log("pathChange");
-			console.log(this.state.editor.getPath());
+			console.log(this._editor.getPath());
 			console.log("pathChange");
 		}.bind(this));
 	}
 
 	handleChange(event) {
-		// console.log(event);
-		this.state.textColor = event.target.name === 'textColor' ? event.target.value : this.state.textColor;
-		this.state.textSize = event.target.name === 'textSize' ? event.target.value : this.state.textSize;
-		console.log(this.state.textColor);
+		var color = event.target.name === 'textColor' ? event.target.value : this.state.textColor;
+		var size = event.target.name === 'textSize' ? event.target.value : this.state.textSize;
+		this.setState({
+			textColor: color,
+			textSize: size
+		});
 	}
 	componentWillMount() {
 		console.log('yay');
@@ -229,21 +244,3 @@ export default class App extends Component {
 		);
 	}
 }
-
-
-
-
-//
-//
-//
-// this.state.editor.addEventListener("focus", function(event) {
-// // 	console.log("Focused");
-// }.bind(this));
-// this.state.editor.addEventListener("input", function(event) {
-// 	// console.log(this.state.editor.getPath());
-// }.bind(this));
-// this.state.editor.addEventListener("pathChange", function(event) {
-// // 	console.log("pathChange");
-// // 	console.log(this.state.editor.getPath());
-// // 	console.log("pathChange");
-// }.bind(this));
