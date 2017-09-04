@@ -10,6 +10,7 @@ export default class App extends Component {
 			underline: false,
 			selected: null
 		};
+		this.clearHtml = this.clearHtml.bind(this);
 	}
 
 	toggleBold() {
@@ -100,6 +101,17 @@ export default class App extends Component {
 		}
 		this.state.editor.removeList(this.state.selected);
 	}
+	printHtml() {
+		if (this.state.editor) {
+			const nodes = this.state.editor.getDocument().getElementsByClassName('clientView')[0].childNodes;
+			nodes.forEach((node) => {
+				document.getElementById('render').innerText += node.outerHTML;
+			});
+		}
+	}
+	clearHtml() {
+		document.getElementById('render').innerText = '';
+	}
 
 	componentDidMount() {
 		var node = document.getElementById('textEditor');
@@ -118,6 +130,9 @@ export default class App extends Component {
 		// init
 		this.state.editor.setHTML("<textarea>");
 		// events
+		this.state.editor.addEventListener("input", function(event) {
+			this.clearHtml();
+		}.bind(this));
 		this.state.editor.addEventListener("select", function(event) {
 			this.state.selected = this.state.editor.getSelectedText();
 			console.log(this.state.selected);
@@ -163,11 +178,14 @@ export default class App extends Component {
 					<button onClick={this.removeAllFormatting.bind(this)} className="btn btn-danger" style={{marginLeft: '80px'}}>RemoveAllFormatting</button>
 					<button onClick={this.undo.bind(this)} className="btn btn-info">Undo</button>
 					<button onClick={this.redo.bind(this)} className="btn btn-success">Redo</button>
+					<button onClick={this.printHtml.bind(this)} className="btn btn-warning">PrintSelectionInHtml</button>
 				</div>
 				<div className="editorWrapper">
-					<div style={{minHeight: '200px'}} id="textEditor">
+					<div style={{minHeight: '200px'}} id="textEditor" className="clientView">
 					</div>
 				</div>
+				<pre id="render">
+				</pre>
 			</div>
 		);
 	}
