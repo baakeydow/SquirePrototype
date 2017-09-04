@@ -82,6 +82,24 @@ export default class App extends Component {
 	alignJustify() {
 		this.state.editor.setTextAlignment('justify');
 	}
+	makeUList() {
+		if (!this.state.selected) {
+			return;
+		}
+		this.state.editor.makeUnorderedList(this.state.selected);
+	}
+	makeOList() {
+		if (!this.state.selected) {
+			return;
+		}
+		this.state.editor.makeOrderedList(this.state.selected);
+	}
+	rmList() {
+		if (!this.state.selected) {
+			return;
+		}
+		this.state.editor.removeList(this.state.selected);
+	}
 
 	componentDidMount() {
 		var node = document.getElementById('textEditor');
@@ -94,6 +112,7 @@ export default class App extends Component {
 		})
 		// config
 		this.state.editor.setConfig({
+			blockTag: 'P', // making a new <p> on enter key
 			blockAttributes: { style: 'font-size: 16px;'}
 		});
 		// init
@@ -125,16 +144,25 @@ export default class App extends Component {
 			<div>
 				<h1>Hello Squire !</h1>
 				<div className="ContentCenter">
-					<button onClick={this.toggleBold.bind(this)} className="btn btn-primary">Bold</button>
-					<button onClick={this.toggleIt.bind(this)} className="btn btn-success">Italic</button>
-					<button onClick={this.toggleUnderline.bind(this)} className="btn btn-info">Underline</button>
-					<button onClick={this.alignLeft.bind(this)}>Left</button>
-					<button onClick={this.alignCenter.bind(this)}>Center</button>
-					<button onClick={this.alignRight.bind(this)}>Right</button>
-					<button onClick={this.alignJustify.bind(this)}>Justify</button>
+					<ul class="list-group">
+						<button className="list-group-item" onClick={this.toggleBold.bind(this)}>Bold</button>
+						<button className="list-group-item" onClick={this.toggleIt.bind(this)}>Italic</button>
+						<button className="list-group-item" onClick={this.toggleUnderline.bind(this)}>Underline</button>
+					</ul>
+					<ul class="list-group">
+						<button className="list-group-item" onClick={this.alignLeft.bind(this)}>Left</button>
+						<button className="list-group-item" onClick={this.alignCenter.bind(this)}>Center</button>
+						<button className="list-group-item" onClick={this.alignRight.bind(this)}>Right</button>
+						<button className="list-group-item" onClick={this.alignJustify.bind(this)}>Justify</button>
+					</ul>
+					<ul class="list-group">
+						<button className="list-group-item" onClick={this.makeUList.bind(this)}>MakeUList</button>
+						<button className="list-group-item" onClick={this.makeOList.bind(this)}>MakeOList</button>
+						<button className="list-group-item" onClick={this.rmList.bind(this)}>RemoveList</button>
+					</ul>
 					<button onClick={this.removeAllFormatting.bind(this)} className="btn btn-danger" style={{marginLeft: '80px'}}>RemoveAllFormatting</button>
-					<button onClick={this.undo.bind(this)} className="btn">Undo</button>
-					<button onClick={this.redo.bind(this)} className="btn">Redo</button>
+					<button onClick={this.undo.bind(this)} className="btn btn-info">Undo</button>
+					<button onClick={this.redo.bind(this)} className="btn btn-success">Redo</button>
 				</div>
 				<div className="editorWrapper">
 					<div style={{minHeight: '200px'}} id="textEditor">
