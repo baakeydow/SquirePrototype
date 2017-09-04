@@ -64,6 +64,25 @@ export default class App extends Component {
 		}
 	}
 
+	undo() {
+		this.state.editor.undo();
+	}
+	redo() {
+		this.state.editor.redo();
+	}
+	alignLeft() {
+		this.state.editor.setTextAlignment('left');
+	}
+	alignCenter() {
+		this.state.editor.setTextAlignment('center');
+	}
+	alignRight() {
+		this.state.editor.setTextAlignment('right');
+	}
+	alignJustify() {
+		this.state.editor.setTextAlignment('justify');
+	}
+
 	componentDidMount() {
 		var node = document.getElementById('textEditor');
 		this.setState({
@@ -75,7 +94,7 @@ export default class App extends Component {
 		})
 		// config
 		this.state.editor.setConfig({
-			blockAttributes: { style: 'font-size: 16px; height: 100px; border-style:solid;'}
+			blockAttributes: { style: 'font-size: 16px;'}
 		});
 		// init
 		this.state.editor.setHTML("<textarea>");
@@ -89,7 +108,6 @@ export default class App extends Component {
 				console.log(this.state.editor.getFontInfo());
 			}
 		}.bind(this));
-
 		this.state.editor.addEventListener("pathChange", function(event) {
 			console.log("pathChange");
 			console.log(this.state.editor.getPath());
@@ -104,13 +122,23 @@ export default class App extends Component {
 	render() {
 		console.log(this.state);
 		return (
-			<div class="app">
+			<div>
 				<h1>Hello Squire !</h1>
-				<button onClick={this.toggleBold.bind(this)} id="test" className="btn btn-primary">Bold</button>
-				<button onClick={this.toggleIt.bind(this)} id="test" className="btn btn-success">Italic</button>
-				<button onClick={this.toggleUnderline.bind(this)} id="test" className="btn btn-info">Underline</button>
-				<button onClick={this.removeAllFormatting.bind(this)} id="test" className="btn btn-danger">RemoveAllFormatting</button>
-				<div style={{margin: '40px'}} id="textEditor">
+				<div className="ContentCenter">
+					<button onClick={this.toggleBold.bind(this)} className="btn btn-primary">Bold</button>
+					<button onClick={this.toggleIt.bind(this)} className="btn btn-success">Italic</button>
+					<button onClick={this.toggleUnderline.bind(this)} className="btn btn-info">Underline</button>
+					<button onClick={this.alignLeft.bind(this)}>Left</button>
+					<button onClick={this.alignCenter.bind(this)}>Center</button>
+					<button onClick={this.alignRight.bind(this)}>Right</button>
+					<button onClick={this.alignJustify.bind(this)}>Justify</button>
+					<button onClick={this.removeAllFormatting.bind(this)} className="btn btn-danger" style={{marginLeft: '80px'}}>RemoveAllFormatting</button>
+					<button onClick={this.undo.bind(this)} className="btn">Undo</button>
+					<button onClick={this.redo.bind(this)} className="btn">Redo</button>
+				</div>
+				<div className="editorWrapper">
+					<div style={{minHeight: '200px'}} id="textEditor">
+					</div>
 				</div>
 			</div>
 		);
