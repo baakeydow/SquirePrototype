@@ -10,9 +10,11 @@ export default class App extends Component {
 			underline: false,
 			textColor: 'blue',
 			textSize: '16px;',
+			textLink: 'https://netvibes.com',
 			selected: null
 		};
 		this.clearHtml = this.clearHtml.bind(this);
+		this.clearPreview = this.clearPreview.bind(this);
 		this.handleChange = this.handleChange.bind(this);
 	}
 
@@ -108,6 +110,20 @@ export default class App extends Component {
 		this._editor.makeOrderedList(this.state.selected);
 	}
 
+	increaseQuoteLevel() {
+		if (!this.state.selected) {
+			return;
+		}
+		this._editor.increaseQuoteLevel(this.state.selected);
+	}
+
+	decreaseQuoteLevel() {
+		if (!this.state.selected) {
+			return;
+		}
+		this._editor.decreaseQuoteLevel(this.state.selected);
+	}
+
 	rmList() {
 		if (!this.state.selected) {
 			return;
@@ -124,8 +140,21 @@ export default class App extends Component {
 		}
 	}
 
+	preview() {
+		if (this._editor) {
+			const nodes = this._editor.getDocument().getElementsByClassName('clientView')[0].childNodes;
+			nodes.forEach((node) => {
+				document.getElementById('preview').innerHTML += node.innerHTML;
+			});
+		}
+	}
+
 	clearHtml() {
 		document.getElementById('render').innerText = '';
+	}
+
+	clearPreview() {
+		document.getElementById('preview').innerHTML = '';
 	}
 
 	setTextColour() {
@@ -140,6 +169,21 @@ export default class App extends Component {
 		}
 	}
 
+	makeLink() {
+		this._editor.makeLink(this.state.textLink, { target: '_blank' });
+	}
+
+	handleChange(event) {
+		var color = event.target.name === 'textColor' ? event.target.value : this.state.textColor;
+		var size = event.target.name === 'textSize' ? event.target.value : this.state.textSize;
+		var tLink = event.target.name === 'textLink' ? event.target.value : this.state.textLink;
+		this.setState({
+			textColor: color,
+			textSize: size,
+			textLink: tLink
+		});
+	}
+
 	componentDidMount() {
 		var node = document.getElementById('textEditor');
 		this._editor = new Squire(node);
@@ -149,6 +193,7 @@ export default class App extends Component {
 			underline: false,
 			textColor: 'blue',
 			textSize: '16px;',
+			textLink: 'https://netvibes.com',
 			selected: null
 		})
 		// config
@@ -161,6 +206,7 @@ export default class App extends Component {
 		// events
 		this._editor.addEventListener("input", function(event) {
 			this.clearHtml();
+			this.clearPreview();
 		}.bind(this));
 		this._editor.addEventListener("select", function(event) {
 			var selected = this._editor.getSelectedText()
@@ -179,14 +225,6 @@ export default class App extends Component {
 		}.bind(this));
 	}
 
-	handleChange(event) {
-		var color = event.target.name === 'textColor' ? event.target.value : this.state.textColor;
-		var size = event.target.name === 'textSize' ? event.target.value : this.state.textSize;
-		this.setState({
-			textColor: color,
-			textSize: size
-		});
-	}
 	componentWillMount() {
 		console.log('yay');
 	}
@@ -197,49 +235,66 @@ export default class App extends Component {
 			<div>
 				<h1>Hello Squire !</h1>
 				<div className="ContentCenter">
-					<ul class="list-group">
-						<button className="list-group-item" onClick={this.toggleBold.bind(this)}>Bold</button>
-						<button className="list-group-item" onClick={this.toggleIt.bind(this)}>Italic</button>
-						<button className="list-group-item" onClick={this.toggleUnderline.bind(this)}>Underline</button>
-					</ul>
-					<ul class="list-group">
-						<button className="list-group-item" onClick={this.alignLeft.bind(this)}>Left</button>
-						<button className="list-group-item" onClick={this.alignCenter.bind(this)}>Center</button>
-						<button className="list-group-item" onClick={this.alignRight.bind(this)}>Right</button>
-						<button className="list-group-item" onClick={this.alignJustify.bind(this)}>Justify</button>
-					</ul>
-					<ul class="list-group">
-						<button className="list-group-item" onClick={this.makeUList.bind(this)}>MakeUList</button>
-						<button className="list-group-item" onClick={this.makeOList.bind(this)}>MakeOList</button>
-						<button className="list-group-item" onClick={this.rmList.bind(this)}>RemoveList</button>
-					</ul>
-					<button onClick={this.setTextColour.bind(this)} className="btn" style={{marginLeft: '40px'}}>setTextColour</button>
-					<select style={{marginLeft: '5px'}} onChange={this.handleChange}  placeholder={this.state.textColor} name="textColor" type="text">
-						<option value="blue">blue</option>
-						<option value="red">red</option>
-						<option value="black">black</option>
-						<option value="yellow">yellow</option>
-					</select>
-					<button onClick={this.setFontSize.bind(this)} className="btn" style={{marginLeft: '40px'}}>setTextSize</button>
-					<select style={{marginLeft: '5px'}} onChange={this.handleChange}  placeholder={this.state.textSize} name="textSize" type="text">
-						<option value="9px">9</option>
-						<option value="12px">12</option>
-						<option value="16px">16</option>
-						<option value="20px">20</option>
-						<option value="30px">30</option>
-						<option value="40px">40</option>
-					</select>
-					<button onClick={this.removeAllFormatting.bind(this)} className="btn btn-danger" style={{marginLeft: '40px'}}>RemoveAllFormatting</button>
-					<button onClick={this.undo.bind(this)} className="btn btn-info">Undo</button>
-					<button onClick={this.redo.bind(this)} className="btn btn-success">Redo</button>
-					<button onClick={this.printHtml.bind(this)} className="btn btn-warning">PrintSelectionInHtml</button>
+					<div className="row">
+						<button onClick={this.setTextColour.bind(this)} className="btn" style={{marginLeft: '40px'}}>setTextColour</button>
+						<select style={{marginLeft: '5px'}} onChange={this.handleChange}  placeholder={this.state.textColor} name="textColor" type="text">
+							<option value="blue">blue</option>
+							<option value="red">red</option>
+							<option value="black">black</option>
+							<option value="yellow">yellow</option>
+						</select>
+						<button onClick={this.makeLink.bind(this)} className="btn" style={{marginLeft: '40px'}}>MakeLink</button>
+						<input onChange={this.handleChange} name="textLink" type="text" placeholder={this.state.textLink}/>
+						<button onClick={this.setFontSize.bind(this)} className="btn" style={{marginLeft: '40px'}}>setTextSize</button>
+						<select style={{marginLeft: '5px'}} onChange={this.handleChange}  placeholder={this.state.textSize} name="textSize" type="text">
+							<option value="9px">9</option>
+							<option value="12px">12</option>
+							<option value="16px">16</option>
+							<option value="20px">20</option>
+							<option value="30px">30</option>
+							<option value="40px">40</option>
+						</select>
+						<button onClick={this.removeAllFormatting.bind(this)} className="btn btn-danger" style={{marginLeft: '40px'}}>RemoveAllFormatting</button>
+						<button onClick={this.undo.bind(this)} className="btn btn-info">Undo</button>
+						<button onClick={this.redo.bind(this)} className="btn btn-success">Redo</button>
+						<button onClick={this.printHtml.bind(this)} className="btn btn-warning">PrintSelectionInHtml</button>
+						<button onClick={this.preview.bind(this)} className="btn btn-warning">Preview</button>
+					</div>
 				</div>
-				<div className="editorWrapper">
-					<div style={{minHeight: '200px'}} id="textEditor" className="clientView">
+				<div className="row ContentCenter" style={{marginTop: '40px'}}>
+					<div className="col-xs-2">
+						<div className="row">
+							<div class="col">
+								<button className="list-group-item" onClick={this.toggleBold.bind(this)}>Bold</button>
+								<button className="list-group-item" onClick={this.toggleIt.bind(this)}>Italic</button>
+								<button className="list-group-item" onClick={this.toggleUnderline.bind(this)}>Underline</button>
+							</div>
+							<div class="col">
+								<button className="list-group-item" onClick={this.alignLeft.bind(this)}>Left</button>
+								<button className="list-group-item" onClick={this.alignCenter.bind(this)}>Center</button>
+								<button className="list-group-item" onClick={this.alignRight.bind(this)}>Right</button>
+								<button className="list-group-item" onClick={this.alignJustify.bind(this)}>Justify</button>
+							</div>
+							<div class="col">
+								<button className="list-group-item" onClick={this.makeUList.bind(this)}>MakeUList</button>
+								<button className="list-group-item" onClick={this.makeOList.bind(this)}>MakeOList</button>
+								<button className="list-group-item" onClick={this.rmList.bind(this)}>RemoveList</button>
+							</div>
+							<div class="col">
+								<button className="list-group-item" onClick={this.increaseQuoteLevel.bind(this)}>IncreaseQuoteLevel</button>
+								<button className="list-group-item" onClick={this.decreaseQuoteLevel.bind(this)}>DecreaseQuoteLevel</button>
+							</div>
+						</div>
+					</div>
+					<div className="col-xs-6 col-md-8 editorWrapper">
+						<div style={{minHeight: '200px'}} id="textEditor" className="clientView">
+						</div>
 					</div>
 				</div>
 				<pre id="render">
 				</pre>
+				<div id="preview">
+				</div>
 			</div>
 		);
 	}
