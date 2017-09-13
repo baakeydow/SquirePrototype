@@ -23,10 +23,10 @@ export default class App extends Component {
 		if (!this.state.selected) {
 			return;
 		} else if (isBold) {
-			this._editor.bold(this.state.selected);
+			this._editor.bold();
 			this.setState({bold: true});
 		} else {
-			this._editor.removeBold(this.state.selected);
+			this._editor.removeBold();
 			this.setState({bold: false});
 		}
 	}
@@ -36,10 +36,10 @@ export default class App extends Component {
 		if (!this.state.selected) {
 			return;
 		} else if (isIt) {
-			this._editor.italic(this.state.selected);
+			this._editor.italic();
 			this.setState({it: true});
 		} else {
-			this._editor.removeItalic(this.state.selected);
+			this._editor.removeItalic();
 			this.setState({it: false});
 		}
 	}
@@ -49,10 +49,10 @@ export default class App extends Component {
 		if (!this.state.selected) {
 			return;
 		} else if (isUnderline) {
-			this._editor.underline(this.state.selected);
+			this._editor.underline();
 			this.setState({underline: true});
 		} else {
-			this._editor.removeUnderline(this.state.selected);
+			this._editor.removeUnderline();
 			this.setState({underline: false});
 		}
 	}
@@ -61,7 +61,7 @@ export default class App extends Component {
 		if (!this.state.selected) {
 			return;
 		} else if (this._editor.hasFormat(this.state.selected)) {
-			this._editor.removeAllFormatting(this.state.selected);
+			this._editor.removeAllFormatting();
 			this.setState({
 				bold: false,
 				it: false,
@@ -97,38 +97,23 @@ export default class App extends Component {
 	}
 
 	makeUList() {
-		if (!this.state.selected) {
-			return;
-		}
-		this._editor.makeUnorderedList(this.state.selected);
+		this._editor.makeUnorderedList();
 	}
 
 	makeOList() {
-		if (!this.state.selected) {
-			return;
-		}
-		this._editor.makeOrderedList(this.state.selected);
+		this._editor.makeOrderedList();
 	}
 
 	increaseQuoteLevel() {
-		if (!this.state.selected) {
-			return;
-		}
-		this._editor.increaseQuoteLevel(this.state.selected);
+		this._editor.increaseQuoteLevel();
 	}
 
 	decreaseQuoteLevel() {
-		if (!this.state.selected) {
-			return;
-		}
-		this._editor.decreaseQuoteLevel(this.state.selected);
+		this._editor.decreaseQuoteLevel();
 	}
 
 	rmList() {
-		if (!this.state.selected) {
-			return;
-		}
-		this._editor.removeList(this.state.selected);
+		this._editor.removeList();
 	}
 
 	printHtml() {
